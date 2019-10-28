@@ -24,7 +24,7 @@ def tipoDato(column):
     lstTipo["CHAR"]     = "char"
     lstTipo["CHARACTER"]    = "dhar"
     lstTipo["INT1"]         = "tinyint"
-    lstTipo["TINYINT"]      = "tinyint"
+    lstTipo["TINYINT"]      = "tinyint" 
     lstTipo["INT2"]         = "smallint"
     lstTipo["SMALLINT"]     = "smallint"
     lstTipo["INT3"]         = "mediumint"
@@ -59,13 +59,15 @@ def tipoDato(column):
     lstTipo["MEDIUMBLOB"]   = "blob(16777215)"
     lstTipo["LONGBLOB"]     = "blob"
     lstTipo["ENUM"]         = "enum"
-    tipo =""
+    tipo = ""
     if column.simpleType:
         tipo = lstTipo[column.simpleType.name]
     else:
         tipo = lstTipo[column.formattedRawType]
     if column.length != -1:
         tipo+="("+str(column.length)+")"
+    if column.precision == 1 and tipo == "tinyint":
+        tipo = "boolean"
     txt += "      type: "+tipo+"\n"
 
 def imprimirRelaciones(table):
@@ -94,10 +96,8 @@ def exportarSchema(catalog):
     for table in schema.tables:
         txt += table.name+":\n"
         txt += "  columns:\n"
-        pos = 1 #column position
         for column in table.columns:
             txt += "    "+column.name+":\n"
-            txt += "      position:"+str(pos)+"\n"
             tipoDato(column)
             if column.simpleType:
                 if column.simpleType.name == "CHAR":
@@ -107,7 +107,6 @@ def exportarSchema(catalog):
             itsPrimary(table, column)
             if column.isNotNull:
                 txt += "      notnull: true\n"
-            pos+=1
         imprimirRelaciones(table)
         txt += "\n"
     currentschemafile = grt.root.wb.docPath
