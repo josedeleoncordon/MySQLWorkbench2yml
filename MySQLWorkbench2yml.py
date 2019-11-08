@@ -72,10 +72,12 @@ def tipoDato(column):
 
 def imprimirRelaciones(table):
     global txt
+    pos = 0
     if table.foreignKeys:
         txt +=  "  relations:\n"
         for key in table.foreignKeys:
-            txt += "    "+key.referencedTable.name+":\n"
+            pos += 1
+            txt += "    "+key.referencedTable.name+"_"+ str(pos) +":\n"
             if key.many:
                 txt += "      foreignType: many\n"
             txt += "      foreignAlias: "+key.owner.name+"s\n"
@@ -107,6 +109,8 @@ def exportarSchema(catalog):
             itsPrimary(table, column)
             if column.isNotNull:
                 txt += "      notnull: true\n"
+            if column.autoIncrement:
+                txt += "      autoincrement: true\n"
         imprimirRelaciones(table)
         txt += "\n"
     currentschemafile = grt.root.wb.docPath
